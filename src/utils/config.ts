@@ -39,3 +39,7 @@ export function getDefaultOutputPath(): string {
     join(homedir(), "Documents", "dev-diary")
   );
 }
+
+export function getDefaultDays(): number {
+  return parseInt(process.env.DAILY_SUMMARY_DAYS || "1", 10);
+}

@@ -22,8 +22,10 @@ export function App() {
         <DirectoryInput
           directory={state.directory}
           outputPath={state.outputPath}
+          daysToInclude={state.daysToInclude}
           onDirectoryChange={actions.setDirectory}
           onOutputPathChange={actions.setOutputPath}
+          onDaysChange={actions.setDaysToInclude}
           onSubmit={actions.startScan}
         />
       )

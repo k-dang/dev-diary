@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react"
 import type { AppState, AppActions, GitRepo, RepoData } from "../types/index.ts"
-import { getDefaultDirectory, getDefaultOutputPath, getConfig } from "../utils/config.ts"
+import { getDefaultDirectory, getDefaultOutputPath, getDefaultDays, getConfig } from "../utils/config.ts"
 import { scanForRepos } from "../services/git-scanner.ts"
 import { getAllRepoData } from "../services/git-data.ts"
 import { generateSummary } from "../services/summarizer.ts"
@@ -16,6 +16,7 @@ export function useAppState(): UseAppStateReturn {
     phase: "input",
     directory: getDefaultDirectory(),
     outputPath: getDefaultOutputPath(),
+    daysToInclude: getDefaultDays(),
     repos: [],
     repoData: [],
     outputFile: "",
@@ -27,6 +28,10 @@ export function useAppState(): UseAppStateReturn {
 
   const setOutputPath = useCallback((path: string) => {
     setState((prev) => ({ ...prev, outputPath: path }))
+  }, [])
+
+  const setDaysToInclude = useCallback((days: number) => {
+    setState((prev) => ({ ...prev, daysToInclude: days }))
   }, [])
 
   const startScan = useCallback(async () => {
@@ -71,7 +76,7 @@ export function useAppState(): UseAppStateReturn {
 
       const repoData = await getAllRepoData(
         state.repos,
-        config.daysToInclude,
+        state.daysToInclude,
         (current, total, repoName) => {
           setState((prev) => ({
             ...prev,
@@ -110,7 +115,7 @@ export function useAppState(): UseAppStateReturn {
         error: error instanceof Error ? error.message : "Failed to generate summary",
       }))
     }
-  }, [state.repos, state.outputPath])
+  }, [state.repos, state.outputPath, state.daysToInclude])
 
   const goBack = useCallback(() => {
     setState((prev) => {
@@ -134,6 +139,7 @@ export function useAppState(): UseAppStateReturn {
     actions: {
       setDirectory,
       setOutputPath,
+      setDaysToInclude,
       startScan,
       confirmPreview,
       goBack,

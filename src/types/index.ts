@@ -29,6 +29,7 @@ export interface AppState {
   phase: AppPhase
   directory: string
   outputPath: string
+  daysToInclude: number
   repos: GitRepo[]
   repoData: RepoData[]
   outputFile: string
@@ -43,6 +44,7 @@ export interface AppState {
 export interface AppActions {
   setDirectory: (dir: string) => void
   setOutputPath: (path: string) => void
+  setDaysToInclude: (days: number) => void
   startScan: () => Promise<void>
   confirmPreview: () => Promise<void>
   goBack: () => void

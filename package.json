@@ -3,6 +3,10 @@
   "module": "index.tsx",
   "type": "module",
   "private": true,
+  "scripts": {
+    "dev": "bun run index.tsx",
+    "check": "tsc --noEmit"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
