@@ -1,0 +1,21 @@
+{
+  "name": "daily-summary",
+  "module": "index.tsx",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^1.2.0",
+    "@opentui/core": "^0.1.68",
+    "@opentui/react": "^0.1.68",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "ai": "^6.0.6",
+    "react": "^19.2.3"
+  }
+}
