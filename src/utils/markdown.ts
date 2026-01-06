@@ -2,24 +2,24 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 function getDateString(): string {
-	const now = new Date();
-	const year = now.getFullYear();
-	const month = String(now.getMonth() + 1).padStart(2, "0");
-	const day = String(now.getDate()).padStart(2, "0");
-	return `${year}-${month}-${day}`;
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 export async function writeDevDiary(
-	content: string,
-	outputDir: string,
+  content: string,
+  outputDir: string,
 ): Promise<string> {
-	// Ensure output directory exists
-	await mkdir(outputDir, { recursive: true });
+  // Ensure output directory exists
+  await mkdir(outputDir, { recursive: true });
 
-	const filename = `dev-diary-${getDateString()}.md`;
-	const filepath = join(outputDir, filename);
+  const filename = `dev-diary-${getDateString()}.md`;
+  const filepath = join(outputDir, filename);
 
-	await writeFile(filepath, content, "utf-8");
+  await writeFile(filepath, content, "utf-8");
 
-	return filepath;
+  return filepath;
 }
