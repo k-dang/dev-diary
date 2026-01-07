@@ -106,12 +106,14 @@ export function DirectoryInput({
           <box
             border
             backgroundColor={focused === "directory" ? "#1a1a2e" : undefined}
+            padding={1}
           >
             <input
               placeholder="Enter directory path..."
               focused={focused === "directory"}
               value={directory}
               onInput={onDirectoryChange}
+              style={{ focusedBackgroundColor: "transparent" }}
             />
           </box>
         </box>
@@ -123,12 +125,14 @@ export function DirectoryInput({
           <box
             border
             backgroundColor={focused === "output" ? "#1a1a2e" : undefined}
+            padding={1}
           >
             <input
               placeholder="Enter output directory..."
               focused={focused === "output"}
               value={outputPath}
               onInput={onOutputPathChange}
+              style={{ focusedBackgroundColor: "transparent" }}
             />
           </box>
         </box>

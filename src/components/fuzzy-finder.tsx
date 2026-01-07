@@ -1,9 +1,7 @@
 import { useKeyboard } from "@opentui/react";
 import { useEffect, useMemo, useState } from "react";
-import {
-  getCommonStartPaths,
-  scanDirectories,
-} from "../services/directory-scanner.ts";
+import { homedir } from "node:os";
+import { scanDirectories } from "../services/directory-scanner.ts";
 import { sortByFuzzyScore } from "../utils/fuzzy-match.ts";
 
 interface FuzzyFinderProps {
@@ -21,24 +19,8 @@ export function FuzzyFinder({ onSelect, onCancel }: FuzzyFinderProps) {
   useEffect(() => {
     async function loadDirectories() {
       setIsLoading(true);
-      const startPaths = getCommonStartPaths();
-      const allDirs: string[] = [];
-
-      // Scan each common starting path
-      for (const startPath of startPaths) {
-        try {
-          const dirs = await scanDirectories(startPath, 2);
-          // Only add the start path if scanning succeeded (means it exists)
-          allDirs.push(startPath);
-          allDirs.push(...dirs);
-        } catch {
-          // Skip paths that don't exist
-        }
-      }
-
-      // Remove duplicates and sort
-      const uniqueDirs = [...new Set(allDirs)].sort();
-      setDirectories(uniqueDirs);
+      const dirs = await scanDirectories(homedir(), 3);
+      setDirectories(dirs);
       setIsLoading(false);
     }
 
