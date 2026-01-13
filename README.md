@@ -7,13 +7,13 @@ A terminal UI application that scans your local git repositories, collects recen
 - Fuzzy-finder directory picker for easy navigation
 - Recursively scans for git repositories (skips `node_modules`)
 - Collects commits and diffs from the last day
-- Generates a narrative dev diary using Google Gemini AI
+- Generates a narrative dev diary using AI via Vercel AI Gateway
 - Outputs a markdown file to your chosen location
 
 ## Prerequisites
 
 - [Bun](https://bun.sh) v1.3.2+
-- A Google Generative AI API key
+- A Vercel AI Gateway API key
 
 ## Installation
 
@@ -26,7 +26,7 @@ bun install
 Set your API key and run the app:
 
 ```bash
-export GOOGLE_GENERATIVE_AI_API_KEY=<your-key>
+export AI_GATEWAY_API_KEY=<your-key>
 bun run index.tsx
 ```
 
@@ -43,7 +43,7 @@ bun run index.tsx
 
 | Environment Variable | Description | Default |
 |---------------------|-------------|---------|
-| `GOOGLE_GENERATIVE_AI_API_KEY` | Google AI API key | *required* |
+| `AI_GATEWAY_API_KEY` | Vercel AI Gateway API key | *required* |
 | `DAILY_SUMMARY_OUTPUT` | Output directory | `~/Documents/dev-diary` |
 | `DAILY_SUMMARY_DEPTH` | Max directory scan depth | `3` |
 | `DAILY_SUMMARY_DAYS` | Days of commits to include | `1` |
