@@ -149,10 +149,6 @@ export function useAppState(): UseAppStateReturn {
     });
   }, []);
 
-  const exit = useCallback(() => {
-    process.exit(0);
-  }, []);
-
   return {
     state,
     actions: {
@@ -163,7 +159,6 @@ export function useAppState(): UseAppStateReturn {
       confirmPreview,
       showFilePreview,
       goBack,
-      exit,
     },
   };
 }

@@ -3,15 +3,12 @@ import { useKeyboard } from "@opentui/react";
 interface ErrorViewProps {
   error: string;
   onBack: () => void;
-  onExit: () => void;
 }
 
-export function ErrorView({ error, onBack, onExit }: ErrorViewProps) {
+export function ErrorView({ error, onBack }: ErrorViewProps) {
   useKeyboard((key) => {
     if (key.name === "escape") {
       onBack();
-    } else if (key.name === "return") {
-      onExit();
     }
   });
 
@@ -28,7 +25,7 @@ export function ErrorView({ error, onBack, onExit }: ErrorViewProps) {
         </text>
 
         <text>
-          <span fg="gray">[Esc] Go back [Enter] Exit</span>
+          <span fg="gray">[Esc] Go back</span>
         </text>
       </box>
     </box>

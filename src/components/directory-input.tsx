@@ -10,7 +10,6 @@ interface DirectoryInputProps {
   onOutputPathChange: (value: string) => void;
   onDaysChange: (days: number) => void;
   onSubmit: () => void;
-  onExit: () => void;
 }
 
 type FocusedField = "directory" | "output" | "days";
@@ -25,7 +24,6 @@ export function DirectoryInput({
   onOutputPathChange,
   onDaysChange,
   onSubmit,
-  onExit,
 }: DirectoryInputProps) {
   const [focused, setFocused] = useState<FocusedField>("directory");
   const [showFinder, setShowFinder] = useState(false);
@@ -42,8 +40,6 @@ export function DirectoryInput({
       });
     } else if (key.name === "return") {
       onSubmit();
-    } else if (key.name === "q" || key.name === "escape") {
-      onExit();
     } else if (key.ctrl && key.name === "f") {
       // Open fuzzy finder for currently focused field (not for days)
       if (focused !== "days") {
@@ -164,7 +160,7 @@ export function DirectoryInput({
 
         <text>
           <span fg="gray">
-            [Tab] Switch fields [←/→] Days [Ctrl+F] Browse [Enter] Start [Q/Esc] Quit
+            [Tab] Switch fields [←/→] Days [Ctrl+F] Browse [Enter] Start
           </span>
         </text>
       </box>

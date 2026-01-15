@@ -3,14 +3,11 @@ import { useKeyboard } from "@opentui/react";
 interface SuccessViewProps {
   outputFile: string;
   onPreview: () => void;
-  onExit: () => void;
 }
 
-export function SuccessView({ outputFile, onPreview, onExit }: SuccessViewProps) {
+export function SuccessView({ outputFile, onPreview }: SuccessViewProps) {
   useKeyboard((key) => {
-    if (key.name === "return") {
-      onExit();
-    } else if (key.name === "p") {
+    if (key.name === "p") {
       onPreview();
     }
   });
@@ -31,9 +28,6 @@ export function SuccessView({ outputFile, onPreview, onExit }: SuccessViewProps)
         <box flexDirection="column" marginTop={1}>
           <text>
             <span fg="gray">[P] Preview file</span>
-          </text>
-          <text>
-            <span fg="gray">[Enter] Exit</span>
           </text>
         </box>
       </box>

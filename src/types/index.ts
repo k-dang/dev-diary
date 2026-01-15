@@ -50,5 +50,4 @@ export interface AppActions {
   confirmPreview: () => Promise<void>;
   showFilePreview: () => void;
   goBack: () => void;
-  exit: () => void;
 }

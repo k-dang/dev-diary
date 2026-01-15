@@ -28,7 +28,6 @@ export function App() {
           onOutputPathChange={actions.setOutputPath}
           onDaysChange={actions.setDaysToInclude}
           onSubmit={actions.startScan}
-          onExit={actions.exit}
         />
       );
 
@@ -55,7 +54,6 @@ export function App() {
         <SuccessView
           outputFile={state.outputFile}
           onPreview={actions.showFilePreview}
-          onExit={actions.exit}
         />
       );
 
@@ -72,7 +70,6 @@ export function App() {
         <ErrorView
           error={state.error ?? "Unknown error"}
           onBack={actions.goBack}
-          onExit={actions.exit}
         />
       );
 
