@@ -53,7 +53,7 @@ jobs:
 
       - name: Publish package
         if: steps.version-check.outputs.should-publish == 'true'
-        run: bun publish -p --access
+        run: bun publish -p --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
