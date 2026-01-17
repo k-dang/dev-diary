@@ -1,6 +1,6 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { loadPersistedConfigSync } from "./persistence.ts";
+import { loadPersistedConfig } from "./persistence.ts";
 
 export interface Config {
   aiGatewayKey: string;
@@ -30,16 +30,16 @@ export function getConfig(): Config {
   };
 }
 
-export function getDefaultDirectory(): string {
-  const persisted = loadPersistedConfigSync();
+export async function getDefaultDirectory(): Promise<string> {
+  const persisted = await loadPersistedConfig();
   if (persisted.directory) {
     return persisted.directory;
   }
   return process.cwd();
 }
 
-export function getDefaultOutputPath(): string {
-  const persisted = loadPersistedConfigSync();
+export async function getDefaultOutputPath(): Promise<string> {
+  const persisted = await loadPersistedConfig();
   if (persisted.outputPath) {
     return persisted.outputPath;
   }
@@ -51,8 +51,8 @@ export function getDefaultOutputPath(): string {
 
 const VALID_DAYS = [1, 3, 7, 14, 30];
 
-export function getDefaultDays(): number {
-  const persisted = loadPersistedConfigSync();
+export async function getDefaultDays(): Promise<number> {
+  const persisted = await loadPersistedConfig();
   if (
     persisted.daysToInclude !== undefined &&
     VALID_DAYS.includes(persisted.daysToInclude)

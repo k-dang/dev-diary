@@ -1,7 +1,5 @@
 import { homedir } from "node:os";
 import { join } from "node:path";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { readFileSync } from "node:fs";
 
 export interface PersistedConfig {
   directory?: string;
@@ -17,33 +15,17 @@ export function getConfigPath(): string {
 }
 
 /**
- * Loads persisted config synchronously from ~/.config/dev-dairy/config.json
- * Returns empty object on any error (file doesn't exist, invalid JSON, etc.)
- * Used during app initialization.
- */
-export function loadPersistedConfigSync(): PersistedConfig {
-  try {
-    const configPath = getConfigPath();
-    const content = readFileSync(configPath, "utf-8");
-    const config = JSON.parse(content);
-    return config;
-  } catch (error) {
-    // File doesn't exist, invalid JSON, or permission error - return empty config
-    return {};
-  }
-}
-
-/**
  * Loads persisted config from ~/.config/dev-dairy/config.json
  * Returns empty object on any error (file doesn't exist, invalid JSON, etc.)
  */
 export async function loadPersistedConfig(): Promise<PersistedConfig> {
   try {
     const configPath = getConfigPath();
-    const content = await readFile(configPath, "utf-8");
+    const file = Bun.file(configPath);
+    const content = await file.text();
     const config = JSON.parse(content);
     return config;
-  } catch (error) {
+  } catch {
     // File doesn't exist, invalid JSON, or permission error - return empty config
     return {};
   }
@@ -58,13 +40,10 @@ export async function savePersistedConfig(
 ): Promise<void> {
   try {
     const configPath = getConfigPath();
-    const configDir = join(homedir(), ".config", "dev-dairy");
+    const configJson = JSON.stringify(config, null, 2);
 
-    // Ensure config directory exists
-    await mkdir(configDir, { recursive: true });
-
-    // Write config with pretty formatting
-    await writeFile(configPath, JSON.stringify(config, null, 2), "utf-8");
+    // Write config with pretty formatting, creating parent directories if needed
+    await Bun.write(configPath, configJson, { createPath: true });
   } catch (error) {
     // Log error but don't crash the app
     console.error("Failed to save config:", error);

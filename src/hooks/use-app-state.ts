@@ -1,4 +1,6 @@
-import { useCallback, useState } from "react";
+import { homedir } from "node:os";
+import { join } from "node:path";
+import { useCallback, useEffect, useState } from "react";
 import { getAllRepoData } from "../services/git-data.ts";
 import { scanForRepos } from "../services/git-scanner.ts";
 import { generateSummary } from "../services/summarizer.ts";
@@ -17,16 +19,57 @@ interface UseAppStateReturn {
   actions: AppActions;
 }
 
+// Fallback values for initial state (before persisted config loads)
+function getFallbackDirectory(): string {
+  return process.cwd();
+}
+
+function getFallbackOutputPath(): string {
+  return (
+    process.env.DAILY_SUMMARY_OUTPUT ||
+    join(homedir(), "Documents", "dev-diary")
+  );
+}
+
+function getFallbackDays(): number {
+  return parseInt(process.env.DAILY_SUMMARY_DAYS || "1", 10);
+}
+
 export function useAppState(): UseAppStateReturn {
   const [state, setState] = useState<AppState>({
     phase: "input",
-    directory: getDefaultDirectory(),
-    outputPath: getDefaultOutputPath(),
-    daysToInclude: getDefaultDays(),
+    directory: getFallbackDirectory(),
+    outputPath: getFallbackOutputPath(),
+    daysToInclude: getFallbackDays(),
     repos: [],
     repoData: [],
     outputFile: "",
   });
+
+  // Load persisted defaults asynchronously after mount
+  useEffect(() => {
+    async function loadDefaults() {
+      try {
+        const [directory, outputPath, daysToInclude] = await Promise.all([
+          getDefaultDirectory(),
+          getDefaultOutputPath(),
+          getDefaultDays(),
+        ]);
+
+        setState((prev) => ({
+          ...prev,
+          directory,
+          outputPath,
+          daysToInclude,
+        }));
+      } catch (error) {
+        // If loading fails, keep fallback values
+        console.error("Failed to load persisted config:", error);
+      }
+    }
+
+    loadDefaults();
+  }, []);
 
   const setDirectory = useCallback((dir: string) => {
     setState((prev) => ({ ...prev, directory: dir }));

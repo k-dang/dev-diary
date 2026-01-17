@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { useKeyboard } from "@opentui/react";
+import { useState } from "react";
 import { FuzzyFinder } from "./fuzzy-finder.tsx";
 
 interface DirectoryInputProps {
@@ -144,7 +144,6 @@ export function DirectoryInput({
           <box
             border
             backgroundColor={focused === "days" ? "#1a1a2e" : undefined}
-            padding={1}
           >
             <text>
               <span fg={focused === "days" ? "cyan" : "gray"}>◀</span>

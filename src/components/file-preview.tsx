@@ -1,6 +1,5 @@
 import { useKeyboard } from "@opentui/react";
-import { readFileSync } from "fs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface FilePreviewProps {
   filePath: string;
@@ -8,13 +7,37 @@ interface FilePreviewProps {
 }
 
 export function FilePreview({ filePath, onBack }: FilePreviewProps) {
-  const [content] = useState(() => {
-    try {
-      return readFileSync(filePath, "utf-8");
-    } catch (error) {
-      return `Error reading file: ${error instanceof Error ? error.message : "Unknown error"}`;
+  const [content, setContent] = useState<string>("Loading...");
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadFile() {
+      try {
+        setIsLoading(true);
+        const file = Bun.file(filePath);
+        const text = await file.text();
+        if (!cancelled) {
+          setContent(text);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setContent(
+            `Error reading file: ${error instanceof Error ? error.message : "Unknown error"}`,
+          );
+          setIsLoading(false);
+        }
+      }
     }
-  });
+
+    loadFile();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [filePath]);
 
   useKeyboard((key) => {
     if (key.name === "escape" || key.name === "q" || key.name === "b") {
@@ -43,7 +66,13 @@ export function FilePreview({ filePath, onBack }: FilePreviewProps) {
           flexDirection="column"
           marginTop={1}
         >
-          <text>{content}</text>
+          <text>
+            {isLoading ? (
+              <span fg="gray">Loading file...</span>
+            ) : (
+              content
+            )}
+          </text>
         </box>
 
         <box marginTop={1}>

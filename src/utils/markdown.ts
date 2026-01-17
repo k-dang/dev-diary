@@ -1,4 +1,3 @@
-import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 function getDateString(): string {
@@ -13,13 +12,11 @@ export async function writeDevDiary(
   content: string,
   outputDir: string,
 ): Promise<string> {
-  // Ensure output directory exists
-  await mkdir(outputDir, { recursive: true });
-
   const filename = `dev-diary-${getDateString()}.md`;
   const filepath = join(outputDir, filename);
 
-  await writeFile(filepath, content, "utf-8");
+  // Write file, creating parent directories if needed
+  await Bun.write(filepath, content, { createPath: true });
 
   return filepath;
 }
