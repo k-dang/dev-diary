@@ -41,7 +41,8 @@
     "build:exe": "bun run scripts/build-exe.ts",
     "prepublishOnly": "bun run build",
     "format": "bunx biome format --write",
-    "lint": "bunx biome lint --write",
+    "lint": "bunx biome lint",
+    "lint:fix": "bunx biome lint --write",
     "check": "bunx tsc --noEmit"
   },
   "devDependencies": {
