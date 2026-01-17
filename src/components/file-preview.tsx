@@ -67,11 +67,7 @@ export function FilePreview({ filePath, onBack }: FilePreviewProps) {
           marginTop={1}
         >
           <text>
-            {isLoading ? (
-              <span fg="gray">Loading file...</span>
-            ) : (
-              content
-            )}
+            {isLoading ? <span fg="gray">Loading file...</span> : content}
           </text>
         </box>
 
