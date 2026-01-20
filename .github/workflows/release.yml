@@ -16,7 +16,7 @@ jobs:
           - { os: windows-latest, name: windows-x64, ext: .exe }
           - { os: ubuntu-latest, name: linux-x64, ext: '' }
           - { os: macos-latest, name: darwin-arm64, ext: '' }
-          - { os: macos-13, name: darwin-x64, ext: '' }
+          - { os: macos-15-intel, name: darwin-x64, ext: '' }
 
     steps:
       - name: Checkout code
