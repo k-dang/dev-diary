@@ -1,6 +1,6 @@
 {
   "name": "@k-dang/dev-diary",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "AI-powered dev diary generator that scans git repos and summarizes your work",
   "author": "Kevin Dang <dangkevin1@gmail.com>",
   "license": "MIT",
