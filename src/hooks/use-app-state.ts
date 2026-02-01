@@ -145,7 +145,9 @@ export function useAppState(): UseAppStateReturn {
         setState((prev) => ({
           ...prev,
           phase: "error",
-          error: "No commits found in the last day across any repositories.",
+          error: `No commits found in the last ${state.daysToInclude} ${
+            state.daysToInclude === 1 ? "day" : "days"
+          } across any repositories.`,
         }));
         return;
       }
@@ -156,7 +158,7 @@ export function useAppState(): UseAppStateReturn {
         repoData,
       }));
 
-      const summaries = await generateSummaries(repoData);
+      const summaries = await generateSummaries(repoData, state.daysToInclude);
       const [bragFile, devLogFile] = await Promise.all([
         writeDevDiary(summaries.brag, state.outputPath, "brag"),
         writeDevDiary(summaries.devLog, state.outputPath, "dev-log"),
