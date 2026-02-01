@@ -4,15 +4,12 @@ import type { GitRepo } from "../types/index.ts";
 interface RepoListProps {
   repos: GitRepo[];
   onConfirm: () => void;
-  onBack: () => void;
 }
 
-export function RepoList({ repos, onConfirm, onBack }: RepoListProps) {
+export function RepoList({ repos, onConfirm }: RepoListProps) {
   useKeyboard((key) => {
     if (key.name === "return") {
       onConfirm();
-    } else if (key.name === "escape") {
-      onBack();
     }
   });
 
@@ -38,7 +35,7 @@ export function RepoList({ repos, onConfirm, onBack }: RepoListProps) {
         </scrollbox>
 
         <text>
-          <span fg="gray">[Enter] Continue [Esc] Go back</span>
+          <span fg="gray">[Enter] Continue</span>
         </text>
       </box>
     </box>

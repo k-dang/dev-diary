@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { useCallback, useEffect, useState } from "react";
 import { getAllRepoData } from "../services/git-data.ts";
 import { scanForRepos } from "../services/git-scanner.ts";
-import { generateSummary } from "../services/summarizer.ts";
+import { generateSummaries } from "../services/summarizer.ts";
 import type { AppActions, AppState } from "../types/index.ts";
 import {
   getConfig,
@@ -44,6 +44,7 @@ export function useAppState(): UseAppStateReturn {
     repos: [],
     repoData: [],
     outputFile: "",
+    outputFiles: { brag: "", devLog: "" },
   });
 
   // Load persisted defaults asynchronously after mount
@@ -155,13 +156,17 @@ export function useAppState(): UseAppStateReturn {
         repoData,
       }));
 
-      const summary = await generateSummary(repoData);
-      const outputFile = await writeDevDiary(summary, state.outputPath);
+      const summaries = await generateSummaries(repoData);
+      const [bragFile, devLogFile] = await Promise.all([
+        writeDevDiary(summaries.brag, state.outputPath, "brag"),
+        writeDevDiary(summaries.devLog, state.outputPath, "dev-log"),
+      ]);
 
       setState((prev) => ({
         ...prev,
         phase: "complete",
-        outputFile,
+        outputFile: bragFile,
+        outputFiles: { brag: bragFile, devLog: devLogFile },
       }));
     } catch (error) {
       setState((prev) => ({
@@ -173,8 +178,30 @@ export function useAppState(): UseAppStateReturn {
     }
   }, [state.repos, state.outputPath, state.daysToInclude]);
 
-  const showFilePreview = useCallback(() => {
-    setState((prev) => ({ ...prev, phase: "file-preview" }));
+  const showFilePreview = useCallback((filePath: string) => {
+    setState((prev) => ({
+      ...prev,
+      outputFile: filePath,
+      phase: "file-preview",
+      previousPhase: prev.phase,
+    }));
+  }, []);
+
+  const showDiaryBrowser = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      phase: "diary-browser",
+      previousPhase: prev.phase,
+    }));
+  }, []);
+
+  const selectDiaryFile = useCallback((path: string) => {
+    setState((prev) => ({
+      ...prev,
+      outputFile: path,
+      phase: "file-preview",
+      previousPhase: "diary-browser",
+    }));
   }, []);
 
   const goBack = useCallback(() => {
@@ -183,7 +210,22 @@ export function useAppState(): UseAppStateReturn {
         case "preview":
           return { ...prev, phase: "input", repos: [] };
         case "file-preview":
-          return { ...prev, phase: "complete" };
+          // Return to diary browser if that's where we came from
+          if (prev.previousPhase === "diary-browser") {
+            return {
+              ...prev,
+              phase: "diary-browser",
+              previousPhase: undefined,
+            };
+          }
+          return { ...prev, phase: "complete", previousPhase: undefined };
+        case "diary-browser":
+          // Return to wherever we came from
+          return {
+            ...prev,
+            phase: prev.previousPhase ?? "input",
+            previousPhase: undefined,
+          };
         case "complete":
           return { ...prev, phase: "input" };
         case "error":
@@ -203,6 +245,8 @@ export function useAppState(): UseAppStateReturn {
       startScan,
       confirmPreview,
       showFilePreview,
+      showDiaryBrowser,
+      selectDiaryFile,
       goBack,
     },
   };

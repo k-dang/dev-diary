@@ -95,7 +95,7 @@ export function DirectoryInput({
       >
         <text>
           <span fg="cyan">
-            Scan your git repositories and generate a dev diary
+            Scan your git repositories and generate BRAG + dev log summaries
           </span>
         </text>
 
@@ -159,7 +159,8 @@ export function DirectoryInput({
 
         <text>
           <span fg="gray">
-            [Tab] Switch fields [←/→] Days [Ctrl+F] Browse [Enter] Start
+            [Tab] Switch fields [←/→] Days [Ctrl+F] Browse [Ctrl+D] Diaries
+            [Enter] Start
           </span>
         </text>
       </box>

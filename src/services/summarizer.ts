@@ -1,5 +1,5 @@
 import { generateText } from "ai";
-import type { RepoData } from "../types/index.ts";
+import type { RepoData, SummaryOutputs } from "../types/index.ts";
 
 function formatRepoDataForPrompt(repoData: RepoData[]): string {
   const sections: string[] = [];
@@ -27,9 +27,64 @@ ${commitSections.join("\n\n")}`);
   return sections.join("\n\n---\n\n");
 }
 
-export async function generateSummary(repoData: RepoData[]): Promise<string> {
+function buildBragPrompt(formattedData: string, today: string): string {
+  return `You are writing a developer's BRAG document entry for ${today}. Given the following git commits and diffs from multiple repositories, write a concise, achievement-focused summary of the day's work.
+
+Guidelines:
+- Write in first person ("I delivered...", "I improved...", "I shipped...")
+- Emphasize impact, outcomes, and business/user value
+- Highlight ownership, scope, and complexity where relevant
+- Group related changes into accomplishment bullets or short sections
+- Include concrete technical details only when they reinforce impact
+- Use markdown formatting for readability
+- Keep the tone confident, professional, and results-oriented
+- Avoid diary or play-by-play narration
+
+Here are the commits and changes:
+
+${formattedData}
+
+Write the BRAG entry now. Start with a "# BRAG - ${today}" heading.`;
+}
+
+function buildDevLogPrompt(formattedData: string, today: string): string {
+  return `You are writing a developer's dev log for ${today}. Given the following git commits and diffs from multiple repositories, write a concise record of the day's work.
+
+Guidelines:
+- Use first person ("I worked on...", "I updated...", "I investigated...")
+- Focus on what was done and why, not on impact or achievements
+- Prefer short sections grouped by repository or theme
+- Keep the tone factual, lightweight, and chronological where sensible
+- Include technical details that clarify scope or intent
+- Use markdown formatting for readability
+- Avoid bragging or performance language
+
+Here are the commits and changes:
+
+${formattedData}
+
+Write the dev log now. Start with a "# Dev Log - ${today}" heading.`;
+}
+
+export async function generateSummaries(
+  repoData: RepoData[],
+): Promise<SummaryOutputs> {
   if (repoData.length === 0) {
-    return "# Dev Diary\n\nNo commits found for the specified time period.";
+    const empty = "No commits found for the specified time period.";
+    return {
+      brag: `# BRAG - ${new Date().toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })}\n\n${empty}`,
+      devLog: `# Dev Log - ${new Date().toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })}\n\n${empty}`,
+    };
   }
 
   const formattedData = formatRepoDataForPrompt(repoData);
@@ -40,27 +95,19 @@ export async function generateSummary(repoData: RepoData[]): Promise<string> {
     day: "numeric",
   });
 
-  const prompt = `You are writing a developer's daily diary entry for ${today}. Given the following git commits and diffs from multiple repositories, write a cohesive narrative summarizing the day's work.
+  const [bragResult, devLogResult] = await Promise.all([
+    generateText({
+      model: "google/gemini-2.5-flash-lite",
+      prompt: buildBragPrompt(formattedData, today),
+    }),
+    generateText({
+      model: "google/gemini-2.5-flash-lite",
+      prompt: buildDevLogPrompt(formattedData, today),
+    }),
+  ]);
 
-Guidelines:
-- Write in first person ("I worked on...", "I fixed...", "I implemented...")
-- Focus on what was accomplished and why, not just what files changed
-- Group related changes together logically
-- Include relevant technical details but keep it readable as a journal entry
-- Start with a brief overview, then go into specifics
-- Use markdown formatting for readability
-- Keep the tone professional but personal
-
-Here are the commits and changes:
-
-${formattedData}
-
-Write the diary entry now. Start with a "# Dev Diary - ${today}" heading.`;
-
-  const { text } = await generateText({
-    model: "google/gemini-2.5-flash-lite",
-    prompt,
-  });
-
-  return text;
+  return {
+    brag: bragResult.text,
+    devLog: devLogResult.text,
+  };
 }

@@ -1,17 +1,8 @@
-import { useKeyboard } from "@opentui/react";
-
 interface ErrorViewProps {
   error: string;
-  onBack: () => void;
 }
 
-export function ErrorView({ error, onBack }: ErrorViewProps) {
-  useKeyboard((key) => {
-    if (key.name === "escape") {
-      onBack();
-    }
-  });
-
+export function ErrorView({ error }: ErrorViewProps) {
   return (
     <box flexDirection="column" padding={1}>
       <box border title="Error" padding={1} flexDirection="column" gap={1}>
@@ -22,10 +13,6 @@ export function ErrorView({ error, onBack }: ErrorViewProps) {
 
         <text>
           <span fg="red">{error}</span>
-        </text>
-
-        <text>
-          <span fg="gray">[Esc] Go back</span>
         </text>
       </box>
     </box>

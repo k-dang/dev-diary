@@ -1,4 +1,5 @@
 import { join } from "node:path";
+import type { SummaryStyle } from "../types/index.ts";
 
 function getDateString(): string {
   const now = new Date();
@@ -11,8 +12,10 @@ function getDateString(): string {
 export async function writeDevDiary(
   content: string,
   outputDir: string,
+  style: SummaryStyle,
 ): Promise<string> {
-  const filename = `dev-diary-${getDateString()}.md`;
+  const prefix = style === "dev-log" ? "dev-log" : "dev-diary";
+  const filename = `${prefix}-${getDateString()}.md`;
   const filepath = join(outputDir, filename);
 
   // Write file, creating parent directories if needed

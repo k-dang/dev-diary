@@ -6,6 +6,7 @@ export type AppPhase =
   | "summarizing"
   | "complete"
   | "file-preview"
+  | "diary-browser"
   | "error";
 
 export interface GitRepo {
@@ -26,14 +27,23 @@ export interface RepoData {
   commits: CommitInfo[];
 }
 
+export type SummaryStyle = "brag" | "dev-log";
+
+export interface SummaryOutputs {
+  brag: string;
+  devLog: string;
+}
+
 export interface AppState {
   phase: AppPhase;
+  previousPhase?: AppPhase;
   directory: string;
   outputPath: string;
   daysToInclude: number;
   repos: GitRepo[];
   repoData: RepoData[];
   outputFile: string;
+  outputFiles: SummaryOutputs;
   error?: string;
   progress?: {
     current: number;
@@ -48,6 +58,8 @@ export interface AppActions {
   setDaysToInclude: (days: number) => void;
   startScan: () => Promise<void>;
   confirmPreview: () => Promise<void>;
-  showFilePreview: () => void;
+  showFilePreview: (filePath: string) => void;
+  showDiaryBrowser: () => void;
+  selectDiaryFile: (path: string) => void;
   goBack: () => void;
 }

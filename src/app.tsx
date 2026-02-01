@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useKeyboard } from "@opentui/react";
+import { DiaryBrowser } from "./components/diary-browser.tsx";
 import { DirectoryInput } from "./components/directory-input.tsx";
 import { ErrorView } from "./components/error-view.tsx";
 import { FilePreview } from "./components/file-preview.tsx";
@@ -10,12 +11,29 @@ import { useAppState } from "./hooks/use-app-state.ts";
 export function App() {
   const { state, actions } = useAppState();
 
-  // Handle async state transitions
-  useEffect(() => {
-    if (state.phase === "scanning") {
-      // Scanning is triggered by startScan action
+  // Global shortcuts
+  const diaryBrowserAllowedPhases = ["input", "preview", "complete", "error"];
+  const backAllowedPhases = [
+    "preview",
+    "file-preview",
+    "diary-browser",
+    "complete",
+    "error",
+  ];
+  useKeyboard((key) => {
+    if (
+      key.ctrl &&
+      key.name === "d" &&
+      diaryBrowserAllowedPhases.includes(state.phase)
+    ) {
+      actions.showDiaryBrowser();
+      return;
     }
-  }, [state.phase]);
+
+    if (key.name === "escape" && backAllowedPhases.includes(state.phase)) {
+      actions.goBack();
+    }
+  });
 
   switch (state.phase) {
     case "input":
@@ -36,11 +54,7 @@ export function App() {
 
     case "preview":
       return (
-        <RepoList
-          repos={state.repos}
-          onConfirm={actions.confirmPreview}
-          onBack={actions.goBack}
-        />
+        <RepoList repos={state.repos} onConfirm={actions.confirmPreview} />
       );
 
     case "fetching":
@@ -52,24 +66,24 @@ export function App() {
     case "complete":
       return (
         <SuccessView
-          outputFile={state.outputFile}
+          outputFiles={state.outputFiles}
           onPreview={actions.showFilePreview}
-          onBack={actions.goBack}
         />
       );
 
     case "file-preview":
+      return <FilePreview filePath={state.outputFile} />;
+
+    case "diary-browser":
       return (
-        <FilePreview filePath={state.outputFile} onBack={actions.goBack} />
+        <DiaryBrowser
+          outputPath={state.outputPath}
+          onSelect={actions.selectDiaryFile}
+        />
       );
 
     case "error":
-      return (
-        <ErrorView
-          error={state.error ?? "Unknown error"}
-          onBack={actions.goBack}
-        />
-      );
+      return <ErrorView error={state.error ?? "Unknown error"} />;
 
     default:
       return <text>Unknown state</text>;
