@@ -109,7 +109,10 @@ export function FilePreview({ filePath }: FilePreviewProps) {
               <span fg="gray">Loading file...</span>
             </text>
           ) : (
-            visibleLines.map((line) => <text key={line}>{line || " "}</text>)
+            visibleLines.map((line, index) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: rows are virtualized; index is stable for each visible slot
+              <text key={index}>{line || " "}</text>
+            ))
           )}
         </box>
 
