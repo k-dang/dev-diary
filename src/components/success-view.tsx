@@ -11,7 +11,7 @@ export function SuccessView({ outputFiles, onPreview }: SuccessViewProps) {
   const [selectedStyle, setSelectedStyle] = useState<SummaryStyle>("brag");
 
   useKeyboard((key) => {
-    if (key.name === "left" || key.name === "right") {
+    if (key.name === "up" || key.name === "down") {
       setSelectedStyle((prev) => (prev === "brag" ? "dev-log" : "brag"));
     }
     if (key.name === "p") {
@@ -45,7 +45,7 @@ export function SuccessView({ outputFiles, onPreview }: SuccessViewProps) {
 
         <box flexDirection="column" marginTop={1}>
           <text>
-            <span fg="gray">[←/→] Toggle [P] Preview</span>
+            <span fg="gray">[↑/↓] Toggle [P] Preview</span>
           </text>
         </box>
       </box>

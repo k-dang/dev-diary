@@ -86,14 +86,20 @@ export function FilePreview({ filePath }: FilePreviewProps) {
           padding={1}
           flexDirection="column"
           marginTop={1}
-          height={visibleHeight + 2}
+          height={visibleHeight + 4}
+          overflow="hidden"
         >
           {isLoading ? (
             <text>
               <span fg="gray">Loading file...</span>
             </text>
           ) : (
-            <scrollbox focused height={visibleHeight}>
+            <scrollbox
+              focused
+              height={visibleHeight}
+              width="100%"
+              scrollX={false}
+            >
               <markdown content={content} syntaxStyle={markdownSyntaxStyle} />
             </scrollbox>
           )}

@@ -48,12 +48,19 @@ describe("generateSummaries", () => {
     expect(result.devLog).toBe("generated-2");
     expect(prompts).toHaveLength(2);
 
-    for (const prompt of prompts) {
-      expect(prompt).toContain("demo-repo");
-      expect(prompt).toContain("/tmp/demo");
-      expect(prompt).toContain("Add feature X");
-      expect(prompt).toContain("abc123");
-      expect(prompt).toContain("+const x = 1");
-    }
+    const bragPrompt = prompts[0];
+    const devLogPrompt = prompts[1];
+
+    expect(bragPrompt).toContain("demo-repo");
+    expect(bragPrompt).toContain("/tmp/demo");
+    expect(bragPrompt).toContain("Add feature X");
+    expect(bragPrompt).toContain("abc123");
+    expect(bragPrompt).toContain("+const x = 1");
+
+    expect(devLogPrompt).toContain("demo-repo");
+    expect(devLogPrompt).toContain("Add feature X");
+    expect(devLogPrompt).not.toContain("/tmp/demo");
+    expect(devLogPrompt).not.toContain("abc123");
+    expect(devLogPrompt).not.toContain("+const x = 1");
   });
 });

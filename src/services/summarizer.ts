@@ -1,7 +1,7 @@
 import { generateText } from "ai";
 import type { RepoData, SummaryOutputs } from "../types/index.ts";
 
-function formatRepoDataForPrompt(repoData: RepoData[]): string {
+function formatDetailedRepoDataForPrompt(repoData: RepoData[]): string {
   const sections: string[] = [];
 
   for (const { repo, commits } of repoData) {
@@ -22,6 +22,24 @@ ${commit.diff}
 Path: ${repo.path}
 
 ${commitSections.join("\n\n")}`);
+  }
+
+  return sections.join("\n\n---\n\n");
+}
+
+function formatHighLevelRepoDataForPrompt(repoData: RepoData[]): string {
+  const sections: string[] = [];
+
+  for (const { repo, commits } of repoData) {
+    if (commits.length === 0) continue;
+
+    const commitSections = commits.map((commit) => {
+      return `- ${commit.message} (${commit.date}, ${commit.author})`;
+    });
+
+    sections.push(`## Repository: ${repo.name}
+
+${commitSections.join("\n")}`);
   }
 
   return sections.join("\n\n---\n\n");
@@ -55,7 +73,8 @@ Guidelines:
 - Focus on what was done and why, not on impact or achievements
 - Prefer short sections grouped by repository or theme
 - Keep the tone factual, lightweight, and chronological where sensible
-- Include technical details that clarify scope or intent
+- Keep details high-level; summarize themes and intent instead of implementation specifics
+- Avoid naming files, components, classes, functions, or line-level code changes
 - Use markdown formatting for readability
 - Avoid bragging or performance language
 
@@ -93,16 +112,17 @@ export async function generateSummaries(
     };
   }
 
-  const formattedData = formatRepoDataForPrompt(repoData);
+  const detailedFormattedData = formatDetailedRepoDataForPrompt(repoData);
+  const highLevelFormattedData = formatHighLevelRepoDataForPrompt(repoData);
 
   const [bragResult, devLogResult] = await Promise.all([
     generateText({
       model: "google/gemini-2.5-flash-lite",
-      prompt: buildBragPrompt(formattedData, periodLabel),
+      prompt: buildBragPrompt(detailedFormattedData, periodLabel),
     }),
     generateText({
       model: "google/gemini-2.5-flash-lite",
-      prompt: buildDevLogPrompt(formattedData, periodLabel),
+      prompt: buildDevLogPrompt(highLevelFormattedData, periodLabel),
     }),
   ]);
 
