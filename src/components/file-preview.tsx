@@ -1,5 +1,15 @@
-import { useKeyboard, useTerminalDimensions } from "@opentui/react";
+import { RGBA, SyntaxStyle } from "@opentui/core";
+import { useTerminalDimensions } from "@opentui/react";
 import { useEffect, useMemo, useState } from "react";
+
+const markdownSyntaxStyle = SyntaxStyle.fromStyles({
+  "markup.heading.1": { fg: RGBA.fromHex("#7dd3fc"), bold: true },
+  "markup.heading.2": { fg: RGBA.fromHex("#93c5fd"), bold: true },
+  "markup.heading.3": { fg: RGBA.fromHex("#a5b4fc"), bold: true },
+  "markup.list": { fg: RGBA.fromHex("#c4b5fd") },
+  "markup.raw": { fg: RGBA.fromHex("#f9a8d4") },
+  default: { fg: RGBA.fromHex("#e5e7eb") },
+});
 
 interface FilePreviewProps {
   filePath: string;
@@ -8,15 +18,17 @@ interface FilePreviewProps {
 export function FilePreview({ filePath }: FilePreviewProps) {
   const [content, setContent] = useState<string>("Loading...");
   const [isLoading, setIsLoading] = useState(true);
-  const [scrollOffset, setScrollOffset] = useState(0);
   const { height: rows } = useTerminalDimensions();
 
   // Calculate visible height (account for borders, padding, header, footer)
   const visibleHeight = Math.max(5, rows - 12);
 
-  const lines = useMemo(() => content.split("\n"), [content]);
-  const totalLines = lines.length;
-  const maxScroll = Math.max(0, totalLines - visibleHeight);
+  const totalLines = useMemo(() => {
+    if (!content) {
+      return 0;
+    }
+    return content.split("\n").length;
+  }, [content]);
 
   useEffect(() => {
     let cancelled = false;
@@ -24,7 +36,6 @@ export function FilePreview({ filePath }: FilePreviewProps) {
     async function loadFile() {
       try {
         setIsLoading(true);
-        setScrollOffset(0);
         const file = Bun.file(filePath);
         const text = await file.text();
         if (!cancelled) {
@@ -48,29 +59,6 @@ export function FilePreview({ filePath }: FilePreviewProps) {
     };
   }, [filePath]);
 
-  useKeyboard((key) => {
-    if (key.name === "up" || key.name === "k") {
-      setScrollOffset((prev) => Math.max(0, prev - 1));
-    } else if (key.name === "down" || key.name === "j") {
-      setScrollOffset((prev) => Math.min(maxScroll, prev + 1));
-    } else if (key.name === "pageup") {
-      setScrollOffset((prev) => Math.max(0, prev - visibleHeight));
-    } else if (key.name === "pagedown") {
-      setScrollOffset((prev) => Math.min(maxScroll, prev + visibleHeight));
-    } else if (key.name === "home" || key.sequence === "g") {
-      setScrollOffset(0);
-    } else if (key.name === "end" || key.sequence === "G") {
-      setScrollOffset(maxScroll);
-    }
-  });
-
-  const visibleLines = useMemo(() => {
-    return lines.slice(scrollOffset, scrollOffset + visibleHeight);
-  }, [lines, scrollOffset, visibleHeight]);
-
-  const scrollPercent =
-    maxScroll > 0 ? Math.round((scrollOffset / maxScroll) * 100) : 100;
-
   return (
     <box flexDirection="column" padding={1}>
       <box
@@ -85,13 +73,9 @@ export function FilePreview({ filePath }: FilePreviewProps) {
             <span fg="gray">File: </span>
             <span fg="cyan">{filePath}</span>
           </text>
-          {!isLoading && totalLines > visibleHeight && (
+          {!isLoading && (
             <text>
-              <span fg="gray">
-                Lines {scrollOffset + 1}-
-                {Math.min(scrollOffset + visibleHeight, totalLines)} of{" "}
-                {totalLines} ({scrollPercent}%)
-              </span>
+              <span fg="gray">{totalLines} lines</span>
             </text>
           )}
         </box>
@@ -109,18 +93,15 @@ export function FilePreview({ filePath }: FilePreviewProps) {
               <span fg="gray">Loading file...</span>
             </text>
           ) : (
-            visibleLines.map((line, index) => (
-              // biome-ignore lint/suspicious/noArrayIndexKey: rows are virtualized; index is stable for each visible slot
-              <text key={index}>{line || " "}</text>
-            ))
+            <scrollbox focused height={visibleHeight}>
+              <markdown content={content} syntaxStyle={markdownSyntaxStyle} />
+            </scrollbox>
           )}
         </box>
 
         <box marginTop={1}>
           <text>
-            <span fg="gray">
-              [↑↓/jk] Scroll [PgUp/PgDn] Page [g/G] Top/Bottom
-            </span>
+            <span fg="gray">[↑↓/PgUp/PgDn] Scroll [Esc] Back</span>
           </text>
         </box>
       </box>

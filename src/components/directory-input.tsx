@@ -16,6 +16,8 @@ type FocusedField = "directory" | "output" | "days";
 
 const DAYS_OPTIONS = [1, 3, 7, 14, 30];
 
+const FIELD_FOCUS_BG = "#1a1a2e";
+
 export function DirectoryInput({
   directory,
   outputPath,
@@ -86,79 +88,67 @@ export function DirectoryInput({
 
   return (
     <box flexDirection="column" padding={1}>
-      <box
-        border
-        title="Daily Summary"
-        padding={1}
-        flexDirection="column"
-        gap={1}
-      >
+      <box title="Daily Summary" padding={1} flexDirection="column" gap={1}>
         <text>
           <span fg="cyan">
             Scan your git repositories and generate BRAG + dev log summaries
           </span>
         </text>
 
-        <box flexDirection="column" gap={1}>
-          <text>
-            Scan directory: <span fg="gray">(Ctrl+F to browse)</span>
-          </text>
-          <box
-            border
-            backgroundColor={focused === "directory" ? "#1a1a2e" : undefined}
-            padding={1}
-          >
-            <input
-              placeholder="Enter directory path..."
-              focused={focused === "directory"}
-              value={directory}
-              onInput={onDirectoryChange}
-              style={{ focusedBackgroundColor: "transparent" }}
-            />
-          </box>
+        <box
+          border
+          borderStyle="rounded"
+          padding={1}
+          height={5}
+          backgroundColor={focused === "directory" ? FIELD_FOCUS_BG : undefined}
+          title="Scan directory: (Ctrl+F to browse)"
+        >
+          <input
+            placeholder="Enter directory path..."
+            focused={focused === "directory"}
+            value={directory}
+            onInput={onDirectoryChange}
+            style={{ focusedBackgroundColor: "transparent" }}
+          />
         </box>
 
-        <box flexDirection="column" gap={1}>
-          <text>
-            Output path: <span fg="gray">(Ctrl+F to browse)</span>
-          </text>
-          <box
-            border
-            backgroundColor={focused === "output" ? "#1a1a2e" : undefined}
-            padding={1}
-          >
-            <input
-              placeholder="Enter output directory..."
-              focused={focused === "output"}
-              value={outputPath}
-              onInput={onOutputPathChange}
-              style={{ focusedBackgroundColor: "transparent" }}
-            />
-          </box>
+        <box
+          border
+          borderStyle="rounded"
+          padding={1}
+          height={5}
+          backgroundColor={focused === "output" ? FIELD_FOCUS_BG : undefined}
+          title="Output path: (Ctrl+F to browse)"
+        >
+          <input
+            placeholder="Enter output directory..."
+            focused={focused === "output"}
+            value={outputPath}
+            onInput={onOutputPathChange}
+            style={{ focusedBackgroundColor: "transparent" }}
+          />
         </box>
 
-        <box flexDirection="column" gap={1}>
+        <box
+          border
+          borderStyle="rounded"
+          padding={1}
+          backgroundColor={focused === "days" ? FIELD_FOCUS_BG : undefined}
+          title="Days to include: (←/→ to change)"
+        >
           <text>
-            Days to include: <span fg="gray">(←/→ to change)</span>
+            <span fg={focused === "days" ? "cyan" : "gray"}>◀</span>
+            {"  "}
+            <span fg={focused === "days" ? "white" : "gray"}>
+              {daysToInclude} {daysToInclude === 1 ? "day" : "days"}
+            </span>
+            {"  "}
+            <span fg={focused === "days" ? "cyan" : "gray"}>▶</span>
           </text>
-          <box
-            border
-            backgroundColor={focused === "days" ? "#1a1a2e" : undefined}
-          >
-            <text>
-              <span fg={focused === "days" ? "cyan" : "gray"}>◀</span>
-              {"  "}
-              <span fg={focused === "days" ? "white" : "gray"}>
-                {daysToInclude} {daysToInclude === 1 ? "day" : "days"}
-              </span>
-              {"  "}
-              <span fg={focused === "days" ? "cyan" : "gray"}>▶</span>
-            </text>
-          </box>
         </box>
 
         <text>
-          <span fg="gray">
+          <span fg="#8693a7">
             [Tab] Switch fields [←/→] Days [Ctrl+F] Browse [Ctrl+D] Diaries
             [Enter] Start
           </span>

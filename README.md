@@ -2,8 +2,6 @@
 
 [![npm version](https://badge.fury.io/js/%40k-dang%2Fdev-diary.svg)](https://www.npmjs.com/package/@k-dang/dev-diary)
 
-> AI-powered dev diary generator that scans your git repositories and creates a narrative summary of your work
-
 A terminal UI application that scans your local git repositories, collects recent commits, and generates an AI-powered "dev diary" summarizing your work.
 
 ## Features
