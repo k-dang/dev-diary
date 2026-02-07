@@ -36,24 +36,32 @@ export function DiaryBrowser({ outputPath, onSelect }: DiaryBrowserProps) {
     ).map(({ item }) => item);
   }, [diaryFiles, query]);
 
-  // Reset selection when filter changes
+  const maxVisible = 10;
+  const visibleFiles = filteredFiles.slice(0, maxVisible);
+
   useEffect(() => {
-    setSelectedIndex(0);
-  }, []);
-  // query
+    setSelectedIndex((prev) =>
+      visibleFiles.length === 0 ? 0 : Math.min(prev, visibleFiles.length - 1),
+    );
+  }, [visibleFiles.length]);
 
   useKeyboard((key) => {
     if (key.name === "return") {
-      const selected = filteredFiles[selectedIndex];
+      const selected = visibleFiles[selectedIndex];
       if (selected) {
         onSelect(selected.path);
       }
     } else if (key.name === "up") {
       setSelectedIndex((prev) => Math.max(0, prev - 1));
     } else if (key.name === "down") {
-      setSelectedIndex((prev) => Math.min(filteredFiles.length - 1, prev + 1));
+      setSelectedIndex((prev) =>
+        visibleFiles.length === 0
+          ? 0
+          : Math.min(visibleFiles.length - 1, prev + 1),
+      );
     } else if (key.name === "backspace") {
       setQuery((prev) => prev.slice(0, -1));
+      setSelectedIndex(0);
     } else if (
       key.sequence &&
       key.sequence.length === 1 &&
@@ -61,16 +69,15 @@ export function DiaryBrowser({ outputPath, onSelect }: DiaryBrowserProps) {
       !key.meta
     ) {
       setQuery((prev) => prev + key.sequence);
+      setSelectedIndex(0);
     }
   });
-
-  const maxVisible = 10;
 
   return (
     <box flexDirection="column" padding={1}>
       <box
         border
-        title="Dev Summary Browser"
+        title="Dev Diary Browser"
         padding={1}
         flexDirection="column"
         gap={1}
@@ -82,11 +89,11 @@ export function DiaryBrowser({ outputPath, onSelect }: DiaryBrowserProps) {
         ) : diaryFiles.length === 0 ? (
           <>
             <text>
-              <span fg="yellow">No dev summary files found</span>
+              <span fg="yellow">No Dev Diary files found</span>
             </text>
             <text>
               <span fg="gray">
-                Generate a summary first, then use Ctrl+D to browse.
+                Generate a Dev Diary first, then use Ctrl+D to browse.
               </span>
             </text>
             <text>
@@ -109,7 +116,7 @@ export function DiaryBrowser({ outputPath, onSelect }: DiaryBrowserProps) {
                     <span fg="gray">No matching diary files</span>
                   </text>
                 ) : (
-                  filteredFiles.slice(0, maxVisible).map((file, index) => (
+                  visibleFiles.map((file, index) => (
                     <text key={file.path}>
                       <span fg={index === selectedIndex ? "cyan" : "gray"}>
                         {index === selectedIndex ? "> " : "  "}
@@ -131,7 +138,7 @@ export function DiaryBrowser({ outputPath, onSelect }: DiaryBrowserProps) {
               <span fg="gray">
                 {filteredFiles.length}{" "}
                 {filteredFiles.length === 1 ? "file" : "files"} | [↑↓] Navigate
-                [Enter] Preview
+                [Enter] Preview [Esc] Back
               </span>
             </text>
           </>

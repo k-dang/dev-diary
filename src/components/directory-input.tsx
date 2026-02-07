@@ -1,5 +1,5 @@
 import { useKeyboard } from "@opentui/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FuzzyFinder } from "./fuzzy-finder.tsx";
 
 interface DirectoryInputProps {
@@ -10,6 +10,7 @@ interface DirectoryInputProps {
   onOutputPathChange: (value: string) => void;
   onDaysChange: (days: number) => void;
   onSubmit: () => void;
+  onOverlayVisibilityChange?: (isVisible: boolean) => void;
 }
 
 type FocusedField = "directory" | "output" | "days";
@@ -26,15 +27,26 @@ export function DirectoryInput({
   onOutputPathChange,
   onDaysChange,
   onSubmit,
+  onOverlayVisibilityChange,
 }: DirectoryInputProps) {
   const [focused, setFocused] = useState<FocusedField>("directory");
   const [showFinder, setShowFinder] = useState(false);
   const [finderTarget, setFinderTarget] = useState<FocusedField>("directory");
 
+  useEffect(() => {
+    onOverlayVisibilityChange?.(showFinder);
+  }, [showFinder, onOverlayVisibilityChange]);
+
   useKeyboard((key) => {
     if (showFinder) return; // Let finder handle keys when open
 
-    if (key.name === "tab") {
+    if (key.name === "up") {
+      setFocused((prev) => {
+        if (prev === "days") return "output";
+        if (prev === "output") return "directory";
+        return "directory";
+      });
+    } else if (key.name === "down") {
       setFocused((prev) => {
         if (prev === "directory") return "output";
         if (prev === "output") return "days";
@@ -88,10 +100,10 @@ export function DirectoryInput({
 
   return (
     <box flexDirection="column" padding={1}>
-      <box title="Daily Summary" padding={1} flexDirection="column" gap={1}>
+      <box border title="Dev Diary" padding={1} flexDirection="column" gap={1}>
         <text>
           <span fg="cyan">
-            Scan your git repositories and generate BRAG + dev log summaries
+            Scan Git repositories and generate BRAG and dev log entries
           </span>
         </text>
 
@@ -101,7 +113,7 @@ export function DirectoryInput({
           padding={1}
           height={5}
           backgroundColor={focused === "directory" ? FIELD_FOCUS_BG : undefined}
-          title="Scan directory: (Ctrl+F to browse)"
+          title="Scan directory (Ctrl+F)"
         >
           <input
             placeholder="Enter directory path..."
@@ -118,7 +130,7 @@ export function DirectoryInput({
           padding={1}
           height={5}
           backgroundColor={focused === "output" ? FIELD_FOCUS_BG : undefined}
-          title="Output path: (Ctrl+F to browse)"
+          title="Output path (Ctrl+F)"
         >
           <input
             placeholder="Enter output directory..."
@@ -134,23 +146,19 @@ export function DirectoryInput({
           borderStyle="rounded"
           padding={1}
           backgroundColor={focused === "days" ? FIELD_FOCUS_BG : undefined}
-          title="Days to include: (←/→ to change)"
+          title="Days to include (←/→)"
         >
           <text>
-            <span fg={focused === "days" ? "cyan" : "gray"}>◀</span>
-            {"  "}
             <span fg={focused === "days" ? "white" : "gray"}>
               {daysToInclude} {daysToInclude === 1 ? "day" : "days"}
             </span>
-            {"  "}
-            <span fg={focused === "days" ? "cyan" : "gray"}>▶</span>
           </text>
         </box>
 
         <text>
           <span fg="#8693a7">
-            [Tab] Switch fields [←/→] Days [Ctrl+F] Browse [Ctrl+D] Diaries
-            [Enter] Start
+            [↑↓] Next/Prev field [Ctrl+D] Diaries [Enter] Start [Esc/Ctrl+C]
+            Quit
           </span>
         </text>
       </box>

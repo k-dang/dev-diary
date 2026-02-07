@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface ProgressViewProps {
   phase: "scanning" | "fetching" | "summarizing";
@@ -27,14 +27,14 @@ export function ProgressView({ phase, progress }: ProgressViewProps) {
   const getMessage = () => {
     switch (phase) {
       case "scanning":
-        return "Scanning for git repositories...";
+        return "Scanning for Git repositories...";
       case "fetching":
         if (progress) {
           return `Fetching git data... (${progress.current}/${progress.total})`;
         }
         return "Fetching git data...";
       case "summarizing":
-        return "Generating summary with AI...";
+        return "Generating Dev Diary with AI...";
       default:
         return "Processing...";
     }
@@ -42,7 +42,7 @@ export function ProgressView({ phase, progress }: ProgressViewProps) {
 
   return (
     <box flexDirection="column" padding={1}>
-      <box border title="Processing" padding={1} flexDirection="column" gap={1}>
+      <box border title="Dev Diary" padding={1} flexDirection="column" gap={1}>
         <text>
           <span fg="cyan">{spinner}</span>
           <span> {getMessage()}</span>

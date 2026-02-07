@@ -17,7 +17,7 @@ export function RepoList({ repos, onConfirm }: RepoListProps) {
     <box flexDirection="column" padding={1}>
       <box
         border
-        title={`Found ${repos.length} repositories`}
+        title={`Dev Diary Repositories (${repos.length})`}
         padding={1}
         flexDirection="column"
         gap={1}
@@ -26,7 +26,7 @@ export function RepoList({ repos, onConfirm }: RepoListProps) {
           <box flexDirection="column">
             {repos.map((repo, index) => (
               <text key={`${repo.name}-${index}`}>
-                <span fg="green"> </span>
+                <span fg="green">• </span>
                 <span fg="white">{repo.name}</span>
                 <span fg="gray"> - {repo.path}</span>
               </text>
@@ -35,7 +35,7 @@ export function RepoList({ repos, onConfirm }: RepoListProps) {
         </scrollbox>
 
         <text>
-          <span fg="gray">[Enter] Continue</span>
+          <span fg="gray">[Enter] Continue [Esc] Back</span>
         </text>
       </box>
     </box>

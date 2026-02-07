@@ -14,7 +14,7 @@ export function SuccessView({ outputFiles, onPreview }: SuccessViewProps) {
     if (key.name === "up" || key.name === "down") {
       setSelectedStyle((prev) => (prev === "brag" ? "dev-log" : "brag"));
     }
-    if (key.name === "p") {
+    if (key.name === "return" || key.name === "p") {
       const filePath =
         selectedStyle === "brag" ? outputFiles.brag : outputFiles.devLog;
       onPreview(filePath);
@@ -23,10 +23,16 @@ export function SuccessView({ outputFiles, onPreview }: SuccessViewProps) {
 
   return (
     <box flexDirection="column" padding={1}>
-      <box border title="Complete" padding={1} flexDirection="column" gap={1}>
+      <box
+        border
+        title="Dev Diary Complete"
+        padding={1}
+        flexDirection="column"
+        gap={1}
+      >
         <text>
           <span fg="green">✓</span>
-          <span> Dev summaries generated successfully!</span>
+          <span> Dev Diary files generated successfully!</span>
         </text>
 
         <text>
@@ -45,7 +51,7 @@ export function SuccessView({ outputFiles, onPreview }: SuccessViewProps) {
 
         <box flexDirection="column" marginTop={1}>
           <text>
-            <span fg="gray">[↑/↓] Toggle [P] Preview</span>
+            <span fg="gray">[↑/↓] Select [Enter/P] Preview [Esc] Back</span>
           </text>
         </box>
       </box>

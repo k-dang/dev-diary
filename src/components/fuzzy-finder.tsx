@@ -1,6 +1,6 @@
+import { homedir } from "node:os";
 import { useKeyboard } from "@opentui/react";
 import { useEffect, useMemo, useState } from "react";
-import { homedir } from "node:os";
 import { scanDirectories } from "../services/directory-scanner.ts";
 import { sortByFuzzyScore } from "../utils/fuzzy-match.ts";
 
@@ -37,26 +37,34 @@ export function FuzzyFinder({ onSelect, onCancel }: FuzzyFinderProps) {
       .map(({ item }) => item);
   }, [directories, query]);
 
-  // Reset selection when filter changes
+  const maxVisible = 10;
+  const visibleDirs = filteredDirs.slice(0, maxVisible);
+
   useEffect(() => {
-    setSelectedIndex(0);
-  }, []);
-  // query
+    setSelectedIndex((prev) =>
+      visibleDirs.length === 0 ? 0 : Math.min(prev, visibleDirs.length - 1),
+    );
+  }, [visibleDirs.length]);
 
   useKeyboard((key) => {
     if (key.name === "escape") {
       onCancel();
     } else if (key.name === "return") {
-      const selected = filteredDirs[selectedIndex];
+      const selected = visibleDirs[selectedIndex];
       if (selected) {
         onSelect(selected);
       }
     } else if (key.name === "up") {
       setSelectedIndex((prev) => Math.max(0, prev - 1));
     } else if (key.name === "down") {
-      setSelectedIndex((prev) => Math.min(filteredDirs.length - 1, prev + 1));
+      setSelectedIndex((prev) =>
+        visibleDirs.length === 0
+          ? 0
+          : Math.min(visibleDirs.length - 1, prev + 1),
+      );
     } else if (key.name === "backspace") {
       setQuery((prev) => prev.slice(0, -1));
+      setSelectedIndex(0);
     } else if (
       key.sequence &&
       key.sequence.length === 1 &&
@@ -64,16 +72,15 @@ export function FuzzyFinder({ onSelect, onCancel }: FuzzyFinderProps) {
       !key.meta
     ) {
       setQuery((prev) => prev + key.sequence);
+      setSelectedIndex(0);
     }
   });
-
-  const maxVisible = 10;
 
   return (
     <box flexDirection="column" padding={1}>
       <box
         border
-        title="Select Directory"
+        title="Dev Diary Directory Picker"
         padding={1}
         flexDirection="column"
         gap={1}
@@ -98,7 +105,7 @@ export function FuzzyFinder({ onSelect, onCancel }: FuzzyFinderProps) {
                     <span fg="gray">No matching directories</span>
                   </text>
                 ) : (
-                  filteredDirs.slice(0, maxVisible).map((dir, index) => (
+                  visibleDirs.map((dir, index) => (
                     <text key={dir}>
                       <span fg={index === selectedIndex ? "cyan" : "gray"}>
                         {index === selectedIndex ? "> " : "  "}

@@ -63,7 +63,7 @@ export function FilePreview({ filePath }: FilePreviewProps) {
     <box flexDirection="column" padding={1}>
       <box
         border
-        title="File Preview"
+        title="Dev Diary Preview"
         padding={1}
         flexDirection="column"
         gap={1}
